@@ -1,6 +1,20 @@
 import socket
 import threading
 
+def handle_client(client_socket, addr):
+    print(f"New client connected from {addr}")
+
+    try:
+        # Something server need to handle
+        print("")
+    except Exception as e:
+        print(f"Error in handeling client {addr}: {e}")
+    finally:
+        client_socket.close()
+        print(f"Connection with {addr} has been closed")
+
+
+
 def start_server():
     host = 'localhost'
     port = 51234
@@ -21,11 +35,15 @@ def start_server():
         while True:
             # Accept a client connection
             client_socket, addr = server_socket.accept()
+
             # Establish a thread to handle the requests from the client
-            client_thread = threading.Thread(target = handle_client, args = (client_sock, addr))
+            client_thread = threading.Thread(target = handle_client, args = (client_socket, addr))
             client_thread.start()
     except KeyboardInterrupt:
         print("Shutting down the server.")
     finally:
         server_socket.close()
+
+if __name__ == "__main__":
+    start_server()
 
