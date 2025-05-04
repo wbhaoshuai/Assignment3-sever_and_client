@@ -7,8 +7,14 @@ def handle_client(client_socket, addr):
     print(f"New client connected from {addr}")
 
     try:
-        # Something server need to handle
-        print("")
+        message = client_socket.recv(1024).decode('utf-8')
+        parts = message.split()
+        size = parts[0]
+        operation = parts[1]
+        key = parts[2]
+        value = ' '.join(parts[3:])
+
+
     except Exception as e:
         print(f"Error in handeling client {addr}: {e}")
     finally:
