@@ -36,7 +36,19 @@ def client_task(name, pathname):
                     old_message = f"{old_formatted_length} {newline}"
                     formatted_length = "{:03d}".format(len(old_message))
                     message = f"{formatted_length} {newline}"
-                    line = file.readline()
+                    
+                    # send a message
+                    client_socket.sendall(message.encode('utf-8'))
+
+                    # Waiting for receiving response
+                    response = client_socket.recv(1024).decode('utf-8')
+                    if response:
+                        # Received valid response, continue processing the next line
+                        line = file.readline()
+                    else:
+                        print("No valid response received.")
+
+
         except FileNotFoundError:
             print("File not found, please check the file path.")       
     except Exception as e:
