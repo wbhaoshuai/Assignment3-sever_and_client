@@ -16,9 +16,9 @@ def client_task(name, pathname):
                     line = line.strip()
                     # Split each line by space (up to 1 split)
                     parts = line.split(' ', 1)
+                    operation = parts[0]
+                    content = parts[1]
                     if len(parts) == 2:
-                        operation = parts[0]
-                        content = parts[1]
                         # Check if k and v length exceeds 970
                         if len(content) > 970:
                             print(f"Error: The content of line '{line}' exceeds 970 characters. Ignoring this entry.")
@@ -43,6 +43,9 @@ def client_task(name, pathname):
                     # Waiting for receiving response
                     response = client_socket.recv(1024).decode('utf-8')
                     if response:
+                        response_content = response[4:]
+                        output = f"{operation} {content}: {response_content}"
+                        print(output)
                         # Received valid response, continue processing the next line
                         line = file.readline()
                     else:
