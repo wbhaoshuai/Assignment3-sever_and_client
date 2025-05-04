@@ -43,13 +43,16 @@ def client_task(name, pathname):
                     # Waiting for receiving response
                     response = client_socket.recv(1024).decode('utf-8')
                     if response:
+                        # formats resonse and outputs it
                         response_content = response[4:]
                         output = f"{operation} {content}: {response_content}"
                         print(output)
                         # Received valid response, continue processing the next line
                         line = file.readline()
                     else:
-                        print("No valid response received.")
+                         print("No valid response received.")
+            stop_message = "Stop"
+            client_socket.sendall(stop_message.encode('utf-8'))
 
 
         except FileNotFoundError:
@@ -70,3 +73,9 @@ def main():
 
     for t in clients:
         t.join()
+    # t = threading.Thread(target = client_task, args = (f"client-1", f"client_1.txt"))
+    # t.start()
+    # t.join()
+
+if __name__ == "__main__":
+   main()

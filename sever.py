@@ -7,41 +7,43 @@ def handle_client(client_socket, addr):
     print(f"New client connected from {addr}")
 
     try:
-        message = client_socket.recv(1024).decode('utf-8')
-        parts = message.split()
-        size = parts[0]
-        operation = parts[1]
-        key = parts[2]
-        value = ' '.join(parts[3:])
+        while(True):
+            message = client_socket.recv(1024).decode('utf-8')
+            if(message == "Stop"):
 
-        if operation == "R":
-            v = READ(key)
+                break
+            parts = message.split()
+            size = parts[0]
+            operation = parts[1]
+            key = parts[2]
+            value = ' '.join(parts[3:])
 
-            if v:
-                old_response = f"OK ({key}, {v}) read"
-                response = format_response(old_response)
-            else:
-                old_response = f"ERR {key} does not exist"
-                response = format_response(old_response)
+            if operation == "R":
+                v = READ(key)
+                if v:
+                    old_response = f"OK ({key}, {v}) read"
+                    response = format_response(old_response)
+                else:
+                    old_response = f"ERR {key} does not exist"
+                    response = format_response(old_response)
+            elif operation == "G":
+                v = GET(key)
+                if v:
+                    old_response = f"OK ({key}, {v}) removed"
+                    response = format_response(old_response)
+                else:
+                    old_response = f"ERR {key} does not exist"
+                    response = format_response(old_response)
+            elif operation == "P":
+                e = PUT(key, value)
+                if not e:
+                    old_response = f"OK ({key}, {value}) added"
+                    response = format_response(old_response)
+                else:
+                    old_response = f"ERR {key} already exists"
+                    response = format_response(old_response)
             client_socket.sendall(response.encode('utf-8'))
-        elif operation == "G":
-            v = GET(key)
-            if v:
-                old_response = f"OK ({key}, {v}) removed"
-                response = format_response(old_response)
-            else:
-                old_response = f"ERR {key} does not exist"
-                response = format_response(old_response)
-            client_socket.sendall(response.encode('utf-8'))
-        elif operation == "P":
-            e = PUT(key, value)
-            if not e:
-                old_response = f"OK ({key}, {value}) added"
-                response = format_response(old_response)
-            else:
-                old_response = f"ERR {key} already exists"
-                response = format_response(old_response)
-            client_socket.sendall(response.encode('utf-8'))
+
 
 
     except Exception as e:
@@ -92,7 +94,7 @@ def start_server():
     server_socket.listen(10)
 
     print("Server is running and ready to accept multiple clients...")
-
+    
     try: 
         while True:
             # Accept a client connection
