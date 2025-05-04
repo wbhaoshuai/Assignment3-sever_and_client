@@ -2,6 +2,7 @@ import socket
 import threading
 
 tuple_space = []
+lock = threading.Lock()
 
 def handle_client(client_socket, addr):
     print(f"New client connected from {addr}")
@@ -18,34 +19,35 @@ def handle_client(client_socket, addr):
             key = parts[2]
             value = ' '.join(parts[3:])
 
-            if operation == "R":
-                v = READ(key)
-                if v:
-                    old_response = f"OK ({key}, {v}) read"
-                    response = format_response(old_response)
-                else:
-                    old_response = f"ERR {key} does not exist"
-                    response = format_response(old_response)
-            elif operation == "G":
-                v = GET(key)
-                if v:
-                    old_response = f"OK ({key}, {v}) removed"
-                    response = format_response(old_response)
-                else:
-                    old_response = f"ERR {key} does not exist"
-                    response = format_response(old_response)
-            elif operation == "P":
-                e = PUT(key, value)
-                if not e:
-                    old_response = f"OK ({key}, {value}) added"
-                    response = format_response(old_response)
-                else:
-                    old_response = f"ERR {key} already exists"
-                    response = format_response(old_response)
+            lock.acquire()
+            try:
+                if operation == "R":
+                    v = READ(key)
+                    if v:
+                        old_response = f"OK ({key}, {v}) read"
+                        response = format_response(old_response)
+                    else:
+                        old_response = f"ERR {key} does not exist"
+                        response = format_response(old_response)
+                elif operation == "G":
+                    v = GET(key)
+                    if v:
+                        old_response = f"OK ({key}, {v}) removed"
+                        response = format_response(old_response)
+                    else:
+                        old_response = f"ERR {key} does not exist"
+                        response = format_response(old_response)
+                elif operation == "P":
+                    e = PUT(key, value)
+                    if not e:
+                        old_response = f"OK ({key}, {value}) added"
+                        response = format_response(old_response)
+                    else:
+                        old_response = f"ERR {key} already exists"
+                        response = format_response(old_response)
+            finally:
+                lock.release()
             client_socket.sendall(response.encode('utf-8'))
-
-
-
     except Exception as e:
         print(f"Error in handeling client {addr}: {e}")
     finally:
