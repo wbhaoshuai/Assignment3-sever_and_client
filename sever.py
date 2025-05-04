@@ -1,6 +1,8 @@
 import socket
 import threading
 
+tuple_space = []
+
 def handle_client(client_socket, addr):
     print(f"New client connected from {addr}")
 
@@ -13,8 +15,12 @@ def handle_client(client_socket, addr):
         client_socket.close()
         print(f"Connection with {addr} has been closed")
 
-
-
+def READ(k):
+     for item in tuple_space:
+        if item[0] == k:
+            return item[1]
+        return None
+     
 def start_server():
     host = 'localhost'
     port = 51234
