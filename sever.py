@@ -26,6 +26,18 @@ def handle_client(client_socket, addr):
             else:
                 response = f"ERR {key} does not exist"
             client_socket.sendall(response.encode('utf-8'))
+        elif operation == "G":
+            v = GET(key)
+            if v:
+                # Obtain the correct size for the response
+                old_response = f"OK ({key}, {v}) removed"
+                old_formatted_length = "{:03d}".format(len(old_response))
+                old_message = f"{old_formatted_length} {old_response}"
+                formatted_length = "{:03d}".format(len(old_message))
+                response = f"{formatted_length} {old_response}"
+            else:
+                response = f"ERR {key} does not exist"
+            client_socket.sendall(response.encode('utf-8'))
 
 
     except Exception as e:
