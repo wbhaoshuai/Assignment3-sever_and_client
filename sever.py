@@ -27,6 +27,13 @@ def GET(k):
             tuple_space.remove(item)
             return item[1]
     return None
+
+def PUT(k, v):
+    for item in tuple_space:
+        if item[0] == k:
+            return 1
+    tuple_space.append((k, v))
+    return 0
      
 def start_server():
     host = 'localhost'
