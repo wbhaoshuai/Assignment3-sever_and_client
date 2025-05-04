@@ -16,39 +16,31 @@ def handle_client(client_socket, addr):
 
         if operation == "R":
             v = READ(key)
+
             if v:
-                # Obtain the correct size for the response
                 old_response = f"OK ({key}, {v}) read"
-                old_formatted_length = "{:03d}".format(len(old_response))
-                old_message = f"{old_formatted_length} {old_response}"
-                formatted_length = "{:03d}".format(len(old_message))
-                response = f"{formatted_length} {old_response}"
+                response = format_response(old_response)
             else:
-                response = f"ERR {key} does not exist"
+                old_response = f"ERR {key} does not exist"
+                response = format_response(old_response)
             client_socket.sendall(response.encode('utf-8'))
         elif operation == "G":
             v = GET(key)
             if v:
-                # Obtain the correct size for the responsev
                 old_response = f"OK ({key}, {v}) removed"
-                old_formatted_length = "{:03d}".format(len(old_response))
-                old_message = f"{old_formatted_length} {old_response}"
-                formatted_length = "{:03d}".format(len(old_message))
-                response = f"{formatted_length} {old_response}"
+                response = format_response(old_response)
             else:
-                response = f"ERR {key} does not exist"
+                old_response = f"ERR {key} does not exist"
+                response = format_response(old_response)
             client_socket.sendall(response.encode('utf-8'))
         elif operation == "P":
             e = PUT(key, value)
             if not e:
-                # Obtain the correct size for the response
                 old_response = f"OK ({key}, {value}) added"
-                old_formatted_length = "{:03d}".format(len(old_response))
-                old_message = f"{old_formatted_length} {old_response}"
-                formatted_length = "{:03d}".format(len(old_message))
-                response = f"{formatted_length} {old_response}"
+                response = format_response(old_response)
             else:
-                response = f"ERR {key} already exists"
+                old_response = f"ERR {key} already exists"
+                response = format_response(old_response)
             client_socket.sendall(response.encode('utf-8'))
 
 
@@ -77,6 +69,13 @@ def PUT(k, v):
             return 1
     tuple_space.append((k, v))
     return 0
+
+def format_response(old_response):
+    old_formatted_length = "{:03d}".format(len(old_response))
+    old_message = f"{old_formatted_length} {old_response}"
+    formatted_length = "{:03d}".format(len(old_message))
+    response = f"{formatted_length} {old_response}"
+    return response
      
 def start_server():
     host = 'localhost'
