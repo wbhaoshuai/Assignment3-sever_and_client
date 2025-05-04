@@ -14,6 +14,19 @@ def handle_client(client_socket, addr):
         key = parts[2]
         value = ' '.join(parts[3:])
 
+        if operation == "R":
+            v = READ(key)
+            if v:
+                # Obtain the correct size for the response
+                old_response = f"OK ({key}, {v}) read"
+                old_formatted_length = "{:03d}".format(len(old_response))
+                old_message = f"{old_formatted_length} {old_response}"
+                formatted_length = "{:03d}".format(len(old_message))
+                response = f"{formatted_length} {old_response}"
+            else:
+                response = f"ERR {key} does not exist"
+            client_socket.sendall(response.encode('utf-8'))
+
 
     except Exception as e:
         print(f"Error in handeling client {addr}: {e}")
