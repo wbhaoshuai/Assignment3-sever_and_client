@@ -2,8 +2,10 @@ import socket
 import threading
 import time
 
+# client_task function, responsible for communicating with the server and processing operations in files
 def client_task(name, pathname):
     try:
+        # Create a TCP socket object and link it to the server
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect(('localhost', 51234))
 
@@ -31,6 +33,7 @@ def client_task(name, pathname):
                             op_char = 'R'
                         elif operation == 'PUT':
                             op_char = 'P'
+                    # Obtain and format message
                     newline = f"{op_char} {content}"
                     old_formatted_length = "{:03d}".format(len(newline))
                     old_message = f"{old_formatted_length} {newline}"
@@ -42,6 +45,7 @@ def client_task(name, pathname):
 
                     # Waiting for receiving response
                     response = client_socket.recv(1024).decode('utf-8')
+
                     if response:
                         # formats resonse and outputs it
                         response_content = response[4:]
@@ -51,31 +55,30 @@ def client_task(name, pathname):
                         line = file.readline()
                     else:
                          print("No valid response received.")
+            # Send a stop message to the server
             stop_message = "Stop"
             client_socket.sendall(stop_message.encode('utf-8'))
-
-
         except FileNotFoundError:
             print("File not found, please check the file path.")       
     except Exception as e:
         print(f"Error for {name}: {e}")
     finally:
+        # Close the client
         client_socket.close()
 
 
 def main():
     clients = []
+    # Create ten client threads and start them
     for i in range(10):
         t = threading.Thread(target = client_task, args = (f"client-{i+1}", f"client_{i + 1}.txt"))
         clients.append(t)
         t.start()
         time.sleep(0.1)
 
+    # Wait for all threads to complete execution
     for t in clients:
         t.join()
-    # t = threading.Thread(target = client_task, args = (f"client-1", f"client_1.txt"))
-    # t.start()
-    # t.join()
-
+        
 if __name__ == "__main__":
    main()
